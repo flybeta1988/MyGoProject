@@ -41,19 +41,13 @@ func uploadHandler(w http.ResponseWriter, r *http.Request)  {
 
 	if r.Method == "POST" {
 		f, h, err := r.FormFile("image")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		check(err)
 
 		filename := h.Filename
 		defer f.Close()
 
 		t, err := os.Create(UPLOAD_DIR + "/" + filename)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		check(err)
 		defer t.Close()
 
 		if _, err := io.Copy(t, f); err != nil {
@@ -79,10 +73,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 func listHandler(w http.ResponseWriter, r *http.Request) {
 	fileInfoArr, err := ioutil.ReadDir(UPLOAD_DIR)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	check(err)
 
 	locals := make(map[string]interface{})
 	images := []string{} //@todo
@@ -104,4 +95,10 @@ func isExists(path string) bool {
 
 func renderHtml(w http.ResponseWriter, tmpl string, locals map[string]interface{}) error {
 	return templates[tmpl].Execute(w, locals)
+}
+
+func check(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
