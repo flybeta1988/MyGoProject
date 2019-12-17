@@ -24,12 +24,7 @@ func main() {
 
 func uploadHandler(w http.ResponseWriter, r *http.Request)  {
 	if r.Method == "GET" {
-		t, err := template.ParseFiles(TPL_DIR + "/upload.html")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		t.Execute(w, nil)
+		renderHtml(w, "upload", nil)
 		return
 	}
 
@@ -78,28 +73,14 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//var listHtml string
-
 	locals := make(map[string]interface{})
 	images := []string{} //@todo
 	for _, fileInfo := range fileInfoArr {
-		//imgid := fileInfo.Name()
-		//listHtml += "<li><a href=\"/view?id="+imgid+"\">"+imgid+"</a></li>"
 		images = append(images, fileInfo.Name())
 	}
 	locals["images"] = images
 
-	//读取指定模板的内容并且返回一个*template.Template 值
-	t, err := template.ParseFiles(TPL_DIR + "/list.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//根据模板语法来执行模板的渲染,并将渲染后的结果作为HTTP的返回数据输出
-	t.Execute(w, locals)
-
-	//io.WriteString(w, "<html><ol>" + listHtml + "</ol></html>")
+	renderHtml(w, "list", locals)
 }
 
 func isExists(path string) bool {
@@ -108,4 +89,15 @@ func isExists(path string) bool {
 		return true
 	}
 	return os.IsExist(err)
+}
+
+func renderHtml(w http.ResponseWriter, tmpl string, locals map[string]interface{}) error {
+	//读取指定模板的内容并且返回一个*template.Template 值
+	t, err := template.ParseFiles(TPL_DIR + "/" + tmpl + ".html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	//根据模板语法来执行模板的渲染,并将渲染后的结果作为HTTP的返回数据输出
+	return t.Execute(w, locals)
 }

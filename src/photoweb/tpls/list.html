@@ -5,10 +5,18 @@
     <title>文件列表</title>
 </head>
 <body>
-<ol>
-    {{range $.images}}
-        <li><a href="/view?id={{.|urlquery}}">{{.|html}}</a></li>
-    {{end}}
-</ol>
+<div><a href="/upload">去上传</a></div>
+<div>
+    <span>图片列表</span>
+{{if $.images}}
+    <ol>
+        {{range $.images}}
+            <li><a href="/view?id={{.|urlquery}}">{{.|html}}</a></li>
+        {{end}}
+    </ol>
+{{else}}
+    <span>No data !</span>
+</div>
+{{end}}
 </body>
 </html>
