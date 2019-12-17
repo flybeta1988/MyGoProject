@@ -9,8 +9,19 @@ import (
 	"os"
 )
 
-const TPL_DIR = "./src/photoweb/tpls"
-const UPLOAD_DIR = "./src/photoweb/uploads"
+const (
+	UPLOAD_DIR = "./src/photoweb/uploads"
+	TEMPLATE_DIR = "./src/photoweb/tpls"
+)
+
+var templates = make(map[string]*template.Template)
+
+func init() {
+	for _, tmpl := range []string{"upload", "list"} {
+		//template.Must()确保了模板不能解析成功时，一定会触发错误处理流程
+		templates[tmpl] = template.Must(template.ParseFiles(TEMPLATE_DIR + "/" + tmpl + ".html"))
+	}
+}
 
 func main() {
 	http.HandleFunc("/", listHandler)
@@ -92,12 +103,5 @@ func isExists(path string) bool {
 }
 
 func renderHtml(w http.ResponseWriter, tmpl string, locals map[string]interface{}) error {
-	//读取指定模板的内容并且返回一个*template.Template 值
-	t, err := template.ParseFiles(TPL_DIR + "/" + tmpl + ".html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	//根据模板语法来执行模板的渲染,并将渲染后的结果作为HTTP的返回数据输出
-	return t.Execute(w, locals)
+	return templates[tmpl].Execute(w, locals)
 }
