@@ -7,9 +7,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime/debug"
 )
 
 const (
+	ListDir = 0x001
+	STATIC_DIR = "./src/photoweb/public"
 	UPLOAD_DIR = "./src/photoweb/uploads"
 	TEMPLATE_DIR = "./src/photoweb/tpls"
 )
@@ -24,9 +27,11 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/", listHandler)
-	http.HandleFunc("/view", viewHandler)
-	http.HandleFunc("/upload", uploadHandler)
+	//mux := http.NewServeMux()
+	//staticDirHandler(mux, "assets", STATIC_DIR, 0)
+	http.HandleFunc("/", safeHandler(listHandler))
+	http.HandleFunc("/view", safeHandler(viewHandler))
+	http.HandleFunc("/upload", safeHandler(uploadHandler))
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
@@ -85,6 +90,19 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 	renderHtml(w, "list", locals)
 }
 
+func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int)  {
+	mux.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request) {
+		file := staticDir + r.URL.Path[len(prefix)-1:]
+		if (flags & ListDir) == 0 {
+			if exists := isExists(file); !exists{
+				http.NotFound(w, r)
+				return
+			}
+		}
+		http.ServeFile(w, r, file)
+	})
+}
+
 func isExists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -104,11 +122,18 @@ func check(err error) {
 }
 
 func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
+	//@todo 未完全理解
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			if e, ok := recover().(error); ok {
-				http.Error(w, err)
+			if err, ok := recover().(error); ok {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				// 或者输出自定义的50x错误页面
+				//w.WriteHeader(http.StatusInternalServerError)
+				//renderHtml(w, "error", err)
+				log.Println("WARN: panic in %v. -%v", fn, err)
+				log.Println(string(debug.Stack()))
 			}
 		}()
+		fn(w, r)
 	}
 }
