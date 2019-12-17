@@ -102,3 +102,13 @@ func check(err error) {
 		panic(err)
 	}
 }
+
+func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if e, ok := recover().(error); ok {
+				http.Error(w, err)
+			}
+		}()
+	}
+}
