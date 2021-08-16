@@ -3,33 +3,34 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_"github.com/go-sql-driver/mysql"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
 	fmt.Println("Hello Mysql !")
 
-	db, err := sql.Open("mysql", "root:123456@/test")
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:6306)/xnw")
 	check(err)
 	defer db.Close()
 
-	stmtOut, err := db.Prepare("SELECT id, name FROM user WHERE id = ?")
+	stmtOut, err := db.Prepare("SELECT id, name FROM test WHERE id = ?")
 	check(err)
 	defer stmtOut.Close()
 
 	var id int
 	var name string
-	err = stmtOut.QueryRow(1).Scan(&id, &name)
+	err = stmtOut.QueryRow(3).Scan(&id, &name)
 	check(err)
 	fmt.Printf("id:%d name:%s\n", id, name)
 
-	rows, err := db.Query("SELECT id, name FROM user")
+	rows, err := db.Query("SELECT id, name FROM test")
 	check(err)
 	defer rows.Close()
 
 	for rows.Next() {
 		var (
-			id int
+			id   int
 			name string
 		)
 		err = rows.Scan(&id, &name)

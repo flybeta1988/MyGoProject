@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	ListDir = 0x001
-	STATIC_DIR = "./src/photoweb/public"
-	UPLOAD_DIR = "./src/photoweb/uploads"
+	ListDir      = 0x001
+	STATIC_DIR   = "./src/photoweb/public"
+	UPLOAD_DIR   = "./src/photoweb/uploads"
 	TEMPLATE_DIR = "./src/photoweb/tpls"
 )
 
@@ -38,7 +38,7 @@ func main() {
 	}
 }
 
-func uploadHandler(w http.ResponseWriter, r *http.Request)  {
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		renderHtml(w, "upload", nil)
 		return
@@ -90,11 +90,11 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 	renderHtml(w, "list", locals)
 }
 
-func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int)  {
+func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int) {
 	mux.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request) {
 		file := staticDir + r.URL.Path[len(prefix)-1:]
 		if (flags & ListDir) == 0 {
-			if exists := isExists(file); !exists{
+			if exists := isExists(file); !exists {
 				http.NotFound(w, r)
 				return
 			}
