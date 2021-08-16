@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -10,8 +12,25 @@ import (
 func main() {
 	fmt.Println("Hello Mysql !")
 
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:6306)/xnw")
-	check(err)
+	fmt.Println(os.Args)
+
+	args := os.Args
+	actStr := args[1]
+	actArr := strings.Split(actStr, "=")
+	act := actArr[1]
+	fmt.Printf("act dataType is: %T\n", act)
+	fmt.Println(act)
+	switch {
+		case act == "list":
+			fmt.Println("this is list act")
+		case act == "add":
+			fmt.Println("this is add act")
+			id := add("aaa")
+			fmt.Println("lastInsertID:", id)
+	}
+	os.Exit(0)
+
+	db := getDB()
 	defer db.Close()
 
 	stmtOut, err := db.Prepare("SELECT id, name FROM test WHERE id = ?")
@@ -43,4 +62,17 @@ func check(err error) {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func getDB() (*sql.DB) {
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/xnw")
+	check(err)
+	return db
+}
+
+func add(name string) int64 {
+	db := getDB()
+	ret,_ := db.Exec("insert into test('name') value (?)", name)
+	id,_ := ret.LastInsertId()
+	return id
 }
