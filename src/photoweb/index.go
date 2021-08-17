@@ -32,7 +32,7 @@ func main() {
 	http.HandleFunc("/", safeHandler(listHandler))
 	http.HandleFunc("/view", safeHandler(viewHandler))
 	http.HandleFunc("/upload", safeHandler(uploadHandler))
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":7070", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}
