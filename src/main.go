@@ -1,13 +1,12 @@
 package main
 
 import (
-	"dbpkg"
 	"fmt"
-	"libs"
+	"libs/dbs"
 )
 
 func main() {
-	str := libs.FunA()
+	str := dbs.Test()
 	fmt.Println(str)
-	dbpkg.Insert("flybeta")
+	//dbpkg.Insert("flybeta")
 }
