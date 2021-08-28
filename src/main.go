@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"libs/dbs"
+	"modtest/libs/dbs"
 )
 
 func main() {

@@ -9,8 +9,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var db *sql.DB
+
 func main() {
-	fmt.Println("Hello Mysql !")
+
+	err := initDB()
+	check(err)
+	defer db.Close()
 
 	fmt.Println(os.Args)
 
@@ -39,14 +44,23 @@ func check(err error) {
 	}
 }
 
-func getDB() *sql.DB {
+func initDB() (err error) {
+	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:6306)/xnw")
+	check(err)
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*func getDB() *sql.DB {
 	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:6306)/xnw")
 	check(err)
 	return db
-}
+}*/
 
 func add(name string) int64 {
-	db := getDB()
 	ret, err := db.Exec("insert into test(`name`) value (?)", name)
 	if err != nil {
 		panic("mysql insert error:" + err.Error())
@@ -57,11 +71,9 @@ func add(name string) int64 {
 
 func list() {
 
-	db := getDB()
 	rows, err := db.Query("SELECT id, name FROM test")
 	check(err)
 	defer rows.Close()
-	defer db.Close()
 
 	for rows.Next() {
 		var (
@@ -77,12 +89,9 @@ func list() {
 }
 
 func detail(id int) {
-
-	db := getDB()
 	stmtOut, err := db.Prepare("SELECT name FROM test WHERE id = ?")
 	check(err)
 	defer stmtOut.Close()
-	defer db.Close()
 
 	var name string
 	err = stmtOut.QueryRow(id).Scan(&name)
