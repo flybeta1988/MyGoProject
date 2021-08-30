@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"modtest/libs/dbs"
+	_"modtest/libs/dbs"
 )
 
 func main() {
-	str := dbs.Test()
+	str := "abc" //dbs.Test()
 	fmt.Println(str)
 	//dbpkg.Insert("flybeta")
 }

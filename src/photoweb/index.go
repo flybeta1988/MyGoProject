@@ -12,14 +12,15 @@ import (
 
 const (
 	ListDir      = 0x001
-	STATIC_DIR   = "./src/photoweb/public"
-	UPLOAD_DIR   = "./src/photoweb/uploads"
-	TEMPLATE_DIR = "./src/photoweb/tpls"
+	STATIC_DIR   = "./photoweb/public"
+	UPLOAD_DIR   = "./photoweb/uploads"
+	TEMPLATE_DIR = "./photoweb/tpls"
 )
 
 var templates = make(map[string]*template.Template)
 
 func init() {
+	log.Println("index init start...")
 	for _, tmpl := range []string{"upload", "list"} {
 		//template.Must()确保了模板不能解析成功时，一定会触发错误处理流程
 		templates[tmpl] = template.Must(template.ParseFiles(TEMPLATE_DIR + "/" + tmpl + ".html"))
