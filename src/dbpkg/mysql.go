@@ -2,6 +2,7 @@ package dbpkg
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -28,4 +29,8 @@ func init() {
 	if DbErr = DB.Ping(); nil != DbErr {
 		panic("数据库连接失败: " + DbErr.Error())
 	}
+}
+
+func Foo() {
+	fmt.Println("dbpkg Foo")
 }

@@ -17,6 +17,8 @@ func main() {
 	//msg, err := greetings.Hello("flybeta")
 	msg, err := greetings.Hellos(names)
 
+	greetings.Foo()
+
 	// If an error was returned, print it to the console and
 	// exit the program.
 	if err != nil {
