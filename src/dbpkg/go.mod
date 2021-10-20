@@ -1,4 +1,4 @@
-module dbpkg
+module test.com/dbpkg
 
 go 1.16
 
