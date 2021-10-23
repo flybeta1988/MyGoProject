@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"xnw.com/controllers"
 	"xnw.com/core"
 	"xnw.com/models"
+	"xnw.com/routes"
 	"xnw.com/utils"
 )
+
+//var app *core.App
 
 func main() {
 	/*defer end()
@@ -16,9 +18,8 @@ func main() {
 	user := models.User{}
 	users := testGetUserList(user)
 	testJson(users)*/
-	app := &core.App{}
-	//courseController := controllers.CourseController{}
-	app.Routes = append(app.Routes, core.Route{"/", courseController.Index})
+	app := new(core.App)
+	routes.Config(app)
 	app.Run()
 }
 

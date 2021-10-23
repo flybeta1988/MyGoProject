@@ -2,7 +2,9 @@ package core
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -13,24 +15,13 @@ type App struct {
 	id string
 	db *sql.DB
 	Routes []Route
+	RoutesMap map[string]ControllerFunc
 }
+
+type ControllerFunc func(Request) *Response
 
 func init() {
 	fmt.Println("core's init() start ...")
-}
-
-func (app *App) InitDB() {
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:6306)/xnw")
-	utils.CheckError(err)
-	err = db.Ping()
-	utils.CheckError(err)
-	app.db = db
-}
-
-func (app *App) initRoutes() {
-	for _, route := range app.Routes {
-		http.HandleFunc(route.path, safeHandler(route.httpHandlerFunc))
-	}
 }
 
 func (app *App) Run() {
@@ -38,6 +29,20 @@ func (app *App) Run() {
 	err := http.ListenAndServe(":7070", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
+	}
+}
+
+func (app *App) InitDB() {
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/test")
+	utils.CheckError(err)
+	err = db.Ping()
+	utils.CheckError(err)
+	app.db = db
+}
+
+func (app *App) initRoutes() {
+	for path, cfunc := range app.RoutesMap {
+		http.HandleFunc(path, safeHandlerV2(cfunc))
 	}
 }
 
@@ -58,10 +63,18 @@ func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (app *App) End() {
-	defer app.db.Close()
+func safeHandlerV2(fn ControllerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		request := Request{r}
+		response := fn(request)
+		data, err := json.Marshal(response)
+		if err != nil {
+
+		}
+		io.WriteString(w, string(data))
+	}
 }
 
-func Test() {
-	fmt.Println("App's Test func!")
+func (app *App) End() {
+	defer app.db.Close()
 }

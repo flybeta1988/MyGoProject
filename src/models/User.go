@@ -5,12 +5,14 @@ import (
 	"fmt"
 )
 
+var NewUser = new(User)
+
 type User struct {
 	Id int64 `json:"id"`
 	Account string `json:"account"`
 	Password string `json:"password"`
 	Name string `json:"name"`
-	Status string `json:"status"`
+	Status int `json:"status"`
 	CreateAt sql.NullString `json:"create_at"`
 	UpdateAt sql.NullString `json:"update_at"`
 }
@@ -39,7 +41,7 @@ func (user *User) Add() (int64, error) {
 func (u *User) Get(id int64) (User, error)  {
 	var user User
 	row := DB.QueryRow("SELECT * FROM `user` WHERE id = ?", id)
-	if err:= row.Scan(&user.Id, &user.Account, &user.Password, &user.Name, &user.CreateAt, &user.UpdateAt); err != nil {
+	if err:= row.Scan(&user.Id, &user.Account, &user.Password, &user.Name, &user.Status, &user.CreateAt, &user.UpdateAt); err != nil {
 		if err == sql.ErrNoRows {
 			return user, fmt.Errorf("GetById: %d: no such row", id)
 		}

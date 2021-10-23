@@ -1,10 +1,8 @@
 package core
 
-import "net/http"
-
 type Route struct {
-	path string
-	httpHandlerFunc http.HandlerFunc
+	Path           string
+	ControllerFunc ControllerFunc
 }
 
 func (route *Route) Get() {
