@@ -17,7 +17,6 @@ func Config(app *core.App) {
 }
 
 func appendRoutes(routes map[string]core.ControllerFunc) {
-	routes["/"] = api.Course.Index
 	routes["/v2/user/detail"] = api.User.Detail
 	routes["/v2/course/detail"] = api.Course.Detail
 }

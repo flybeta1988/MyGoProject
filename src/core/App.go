@@ -33,7 +33,8 @@ func (app *App) Run() {
 }
 
 func (app *App) InitDB() {
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/test")
+	//db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/test")
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:6306)/xnw")
 	utils.CheckError(err)
 	err = db.Ping()
 	utils.CheckError(err)

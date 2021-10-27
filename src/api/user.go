@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"xnw.com/core"
 	"xnw.com/models"
 )
@@ -20,7 +19,6 @@ func (c *UserApi) Detail(request core.Request) *core.Response {
 	data["id"] = id
 
 	user, _ := models.NewUser.Get(id)
-	fmt.Println(user)
 	data["user"] = user
 
 	response := &core.Response{}

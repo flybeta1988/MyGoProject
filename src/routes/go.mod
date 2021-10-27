@@ -12,3 +12,5 @@ require (
 )
 
 replace xnw.com/core => ../core
+
+replace xnw.com/models => ../models
