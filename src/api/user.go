@@ -18,7 +18,7 @@ func (c *UserApi) Detail(request core.Request) *core.Response {
 	data = make(map[string]interface{})
 	data["id"] = id
 
-	user, _ := models.NewUser.Get(id)
+	user, _ := models.NewUserModel.Get(id)
 	data["user"] = user
 
 	response := &core.Response{}

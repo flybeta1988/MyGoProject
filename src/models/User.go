@@ -7,6 +7,9 @@ import (
 
 var NewUser = new(User)
 
+var m = &Model{Table:"user"}
+var NewUserModel = &UserModel{Model: m, Fields: &User{}}
+
 type User struct {
 	Id int64 `json:"id"`
 	Account string `json:"account"`
@@ -18,8 +21,9 @@ type User struct {
 }
 
 type UserModel struct {
-	Model
-	table string
+	*Model
+	Table string
+	Fields *User
 }
 
 func (um *UserModel) FooTest()  {
@@ -42,6 +46,7 @@ func (u *User) Get(id int64) (User, error)  {
 	var user User
 	row := DB.QueryRow("SELECT * FROM `user` WHERE id = ?", id)
 	if err:= row.Scan(&user.Id, &user.Account, &user.Password, &user.Name, &user.Status, &user.CreateAt, &user.UpdateAt); err != nil {
+	//if err:= row.Scan(&user); err != nil {
 		if err == sql.ErrNoRows {
 			return user, fmt.Errorf("GetById: %d: no such row", id)
 		}
