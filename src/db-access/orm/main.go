@@ -17,8 +17,8 @@ var db *gorm.DB
 
 func main() {
 	initDB()
-	//test2()
-	update()
+	test2()
+	//update()
 }
 
 func initDB() {
