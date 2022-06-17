@@ -5,11 +5,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 )
 
 const (
-	BASE_DIR = "./gowiki/"
+	BASE_DIR = "./"
 	TPLE_DIR = BASE_DIR + "tpls/"
 	DATA_DIR = BASE_DIR + "data/"
 )
@@ -20,16 +21,17 @@ type Page struct {
 }
 
 var templates = make(map[string]*template.Template)
+//var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 func init() {
-	for _, tpl := range []string{"view", "edit"} {
+	for _, tpl := range []string{"index", "view", "edit"} {
 		templates[tpl] = template.Must(template.ParseFiles(TPLE_DIR + tpl + ".html"))
 	}
 }
 
 func main() {
-	http.HandleFunc("/", makeHandler(viewHandler))
+	http.HandleFunc("/", makeHandler(indexHandler))
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
@@ -44,7 +46,8 @@ func (p *Page) save() error {
 func loadPage(title string) (*Page, error) {
 	filename := DATA_DIR + title + ".txt"
 	log.Println("filename: " + filename)
-	body, err := ioutil.ReadFile(filename)
+	body, err := os.ReadFile(filename)
+	//body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -60,19 +63,29 @@ func renderTemplate(w http.ResponseWriter, tpl string, p *Page)  {
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		m := validPath.FindStringSubmatch(r.URL.Path)
-		if m == nil {
-			log.Println("url not found!")
-			http.NotFound(w, r)
-			return
+		var title string
+		rUrlPath := r.URL.Path
+		log.Println("rUrlPath:" + rUrlPath)
+		if "/" == rUrlPath {
+			title = ""
+		} else {
+			m := validPath.FindStringSubmatch(rUrlPath)
+			log.Println(m)
+			if m == nil {
+				log.Println("url not found!")
+				http.NotFound(w, r)
+				return
+			}
+			title = m[2]
 		}
-		fn(w, r, m[2])
+
+		fn(w, r, title)
 	}
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request, title string)  {
 	p := &Page{Title: title}
-	renderTemplate(w, "view", p)
+	renderTemplate(w, "index", p)
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request, title string)  {

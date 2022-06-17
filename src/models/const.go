@@ -12,7 +12,7 @@ var DB *sql.DB
 func init() {
 	fmt.Println("models init start ...")
 	fmt.Println("DB type: %T", DB)
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/test")
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test")
 	utils.CheckError(err)
 	err = db.Ping()
 	utils.CheckError(err)
